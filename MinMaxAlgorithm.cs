@@ -1,4 +1,5 @@
-﻿using System;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,13 +35,20 @@ public class MinMaxAlgorithm: MoveMaker
         // Call the MinMax implementation
         State bestMove = MinMax(newState); //Aqui comeca a chamar como se fosse o Max
         // returning the actual state. You should modify this
-        return newState;
+        return bestMove;
     }
 
     public State MinMax(State currentState) //1 se Max e 2 se Min
-        //nao sei como fazer para retornar o state final visto que a funcao sMax retorna um float
     {
-        SMax(currentState);
+        
+        float aux = SMax(currentState);
+        List<State> available_states = GeneratePossibleStates(new State(currentState));
+        for(int i=0; i<available_states.Count; i++)
+        {
+            if(aux == SMin(available_states[i])){
+                return available_states[i];
+            }
+        }
         return null;
     }
 
