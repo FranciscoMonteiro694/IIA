@@ -57,7 +57,7 @@ public class HumanPlayer : PlayerController {
 
         } else
         {
-            if (!tile.hasUnit() && source != null && source.IsNeighbour(tile))
+            if (!tile.hasUnit() && !tile.HasWall && source != null && source.IsNeighbour(tile))
             {
                 destination = tile;
             }

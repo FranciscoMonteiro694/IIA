@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System;
 
@@ -8,7 +8,7 @@ public class UtilityFunction
     public float evaluate(State s)
     {
         float acum1 = 0;
-        if(s.AdversaryUnits.Count == 0)
+        if (s.AdversaryUnits.Count == 0)
         {
             foreach (Unit t in s.PlayersUnits)
             {

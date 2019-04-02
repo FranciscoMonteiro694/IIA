@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -39,7 +39,7 @@ public class MinMaxAlgorithm : MoveMaker
 
     public State MinMax(State currentState) //1 se Max e 2 se Min
     {
-
+        this.MaxPlayer.ExpandedNodes = 0;
         float aux = SMax(currentState);
         List<State> available_states = GeneratePossibleStates(new State(currentState));
         for (int i = 0; i < available_states.Count; i++)

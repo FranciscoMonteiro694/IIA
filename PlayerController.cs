@@ -210,7 +210,7 @@ public class PlayerController : MonoBehaviour {
     public void Move(Tile source, Tile destination)
     {
         GameManager.instance.tileboard[(int)destination.gridPosition.x, (int)destination.gridPosition.y].inTile = source.inTile;
-        UpdatePlayerUI(source.inTile,"Move [" + source.inTile.id+"] from " + source.gridPosition.ToString() + " to " + source.gridPosition.ToString() + "");
+        UpdatePlayerUI(source.inTile,"Move [" + source.inTile.id+"] from " + source.gridPosition.ToString() + " to " + destination.gridPosition.ToString() + "");
 
         MarkNeighbours(source, false);
 

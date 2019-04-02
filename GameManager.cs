@@ -144,8 +144,9 @@ public class GameManager : MonoBehaviour
                 tile.name = "T:(" + i + " , " + j + ")";
                 tile.transform.SetParent(tiles.transform);
                 tile.worldPosition = worldPoint;
-                tile.Walkable = value > 0;
-                if (!tile.Walkable)
+                tile.HasWall = value < 0;
+                tile.Walkable = true;
+                if (tile.HasWall)
                 {
                     tile.GetComponent<Renderer>().material.color = Color.black;
                 }
@@ -175,7 +176,7 @@ public class GameManager : MonoBehaviour
             if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY)
             {
                 Tile neighbour = tileboard[checkX, checkY];
-                if (neighbour.Walkable)
+                if (neighbour.Walkable && !neighbour.HasWall)
                     neighbours.Add(neighbour);
 
             }

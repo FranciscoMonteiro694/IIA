@@ -10,6 +10,20 @@ public class Tile : MonoBehaviour {
 
     public Vector2 gridPosition = Vector2.zero;
     private bool walkable;
+    private bool hasWall;
+
+    public bool HasWall
+    {
+        get
+        {
+            return hasWall;
+        }
+        set
+        {
+            this.hasWall = value;
+        }
+    }
+
     public bool Walkable
     {
         get
@@ -30,14 +44,14 @@ public class Tile : MonoBehaviour {
     }
 
     void OnMouseEnter() {
-        if(walkable && IsNeighbour())
+        if(walkable && IsNeighbour() && !hasWall)
         {
             transform.GetComponent<Renderer>().material.color = Color.gray;
 		}
     }
 	
 	void OnMouseExit() {
-        if(!unitSelected && walkable)
+        if(!unitSelected && walkable && !hasWall)
         {
             transform.GetComponent<Renderer>().material.color = Color.white;
         }
