@@ -44,7 +44,7 @@ public class MinMaxAlgorithm : MoveMaker
 
         this.MaxPlayer.ExpandedNodes = 0;
         State aux1 = null;
-        float aux = -99999;
+        float aux = -999999;
         float poi = 0;
         List<State> available_states = GeneratePossibleStates(currentState);
         for (int i = 0; i < available_states.Count; i++)
@@ -78,12 +78,11 @@ public class MinMaxAlgorithm : MoveMaker
         List<State> available_states = new List<State>();
         available_states = GeneratePossibleStates(state);
         int i;
-        float best = SMin(new State(available_states[0]), alfa, beta);
-        for (i = 1; i < available_states.Count; i++)
+        float best = -999999;
+        for (i = 0; i < available_states.Count; i++)
         {
             best = Math.Max(best, SMin(new State(available_states[i]), alfa, beta));
             if (best >= beta) {
-                alpa1 += 1;
                 return best;
             }
             alfa = Math.Max(alfa, best);
@@ -107,16 +106,16 @@ public class MinMaxAlgorithm : MoveMaker
         List<State> available_states = new List<State>();
         available_states = GeneratePossibleStates(state);
         int i;
-        float best = SMax(new State(available_states[0]), alfa, beta);
-        for (i = 1; i < available_states.Count; i++)
+        float best = +999999;
+        for (i = 0; i < available_states.Count; i++)
         {
-            best = Math.Max(best, SMax(new State(available_states[i]), alfa, beta));
+            best = Math.Min(best, SMax(new State(available_states[i]), alfa, beta));
             if (best <= alfa)
             {
                 alpa1 += 1;
                 return best;
             }
-            beta = Math.Max(beta, best);
+            beta = Math.Min(beta, best);
         }
         return best;
     }
