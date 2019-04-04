@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,9 +7,9 @@ using DeepCopyExtensions;
 public class MinMaxAlgorithm : MoveMaker
 {
     public EvaluationFunction evaluator;
-    public State MainState;
     private UtilityFunction utilityfunc;
     public int depth = 0;
+    public int alpa1 = 0, alpa11=0;
     private PlayerController MaxPlayer;
     private PlayerController MinPlayer;
 
@@ -29,67 +29,94 @@ public class MinMaxAlgorithm : MoveMaker
 
     private State GenerateNewState()
     {
+        float alfa=-9999999, beta=+9999999;
         // Creates initial state
+        alpa1 = 0;
         State newState = new State(this.MaxPlayer, this.MinPlayer);
         // Call the MinMax implementation
-        State bestMove = MinMax(newState); //Aqui comeca a chamar como se fosse o Max
+        State bestMove = MinMax(newState, alfa, beta); //Aqui comeca a chamar como se fosse o Max
         // returning the actual state. You should modify this
         return bestMove;
     }
 
-    public State MinMax(State currentState) //1 se Max e 2 se Min
+    public State MinMax(State currentState, float alfa, float beta) //1 se Max e 2 se Min
     {
+
         this.MaxPlayer.ExpandedNodes = 0;
-        float aux = SMax(currentState);
-        List<State> available_states = GeneratePossibleStates(new State(currentState));
+        State aux1 = null;
+        float aux = -99999;
+        float poi = 0;
+        List<State> available_states = GeneratePossibleStates(currentState);
         for (int i = 0; i < available_states.Count; i++)
         {
-            if (aux == SMin(available_states[i]))
+            this.MaxPlayer.ExpandedNodes = 0;
+            poi = SMin(new State(available_states[i]), alfa, beta);
+            Debug.Log("Valor de poi: "+ poi);
+            if (aux < poi)
             {
-                return available_states[i];
+                aux1 = available_states[i];
+                aux = poi;
             }
+            
+
         }
-        return null;
+        return aux1;
     }
 
-    public float SMax(State state)
+    public float SMax(State state, float alfa, float beta)
     {
+
         if (isFinal(state))
         {
             return utilityfunc.evaluate(state);
         }
-        if (this.MaxPlayer.ExpandedNodes >= 1000)
+        if (this.MaxPlayer.ExpandedNodes >= this.MaxPlayer.MaximumNodesToExpand)
         {
             return evaluator.evaluate(state);
         }
+
         List<State> available_states = new List<State>();
-        available_states = GeneratePossibleStates(new State(state)); //gera todas as possibilidades na prespetiva do adversario (daí o new) ns se ta bem
+        available_states = GeneratePossibleStates(state);
         int i;
-        float best = SMin(available_states[0]);
+        float best = SMin(new State(available_states[0]), alfa, beta);
         for (i = 1; i < available_states.Count; i++)
         {
-            best = Math.Max(best, SMin(available_states[i]));
+            best = Math.Max(best, SMin(new State(available_states[i]), alfa, beta));
+            if (best >= beta) {
+                alpa1 += 1;
+                return best;
+            }
+            alfa = Math.Max(alfa, best);
+
         }
         return best;
     }
 
-    public float SMin(State state)
+    public float SMin(State state, float alfa, float beta)
     {
+
         if (isFinal(state))
         {
             return utilityfunc.evaluate(state);
         }
-        if (this.MaxPlayer.ExpandedNodes >= 1000)
+        if (this.MaxPlayer.ExpandedNodes >= this.MaxPlayer.MaximumNodesToExpand)
         {
             return evaluator.evaluate(state);
         }
+
         List<State> available_states = new List<State>();
-        available_states = GeneratePossibleStates(new State(state));
+        available_states = GeneratePossibleStates(state);
         int i;
-        float best = SMax(available_states[0]);
+        float best = SMax(new State(available_states[0]), alfa, beta);
         for (i = 1; i < available_states.Count; i++)
         {
-            best = Math.Max(best, SMax(available_states[i]));
+            best = Math.Max(best, SMax(new State(available_states[i]), alfa, beta));
+            if (best <= alfa)
+            {
+                alpa1 += 1;
+                return best;
+            }
+            beta = Math.Max(beta, best);
         }
         return best;
     }
@@ -101,6 +128,7 @@ public class MinMaxAlgorithm : MoveMaker
         }
         else { return false; }
     }
+
 
 
     private List<State> GeneratePossibleStates(State state)
@@ -162,11 +190,17 @@ public class MinMaxAlgorithm : MoveMaker
         attacked.hp += Math.Min(0, (attackedUnitBonus.Item1)) - (currentUnitBonus.Item2 + currentUnit.attack);
         state.unitAttacked = attacked;
 
+        state.board[attacked.x, attacked.y] = attacked;
+        int index = state.AdversaryUnits.IndexOf(attacked);
+        state.AdversaryUnits[index] = attacked;
+
+
+
         if (attacked.hp <= 0)
         {
             //Board update by killing the unit!
             state.board[attacked.x, attacked.y] = null;
-            int index = state.AdversaryUnits.IndexOf(attacked);
+            index = state.AdversaryUnits.IndexOf(attacked);
             state.AdversaryUnits.RemoveAt(index);
 
         }
