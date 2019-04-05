@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System;
 
@@ -14,15 +14,17 @@ public class UtilityFunction
             {
                 acum1 += t.hp * t.pontos;
             }
-            return acum1;
+            return 999999;
         }
-        else
+        if(s.PlayersUnits.Count == 0)
         {
             foreach (Unit t in s.AdversaryUnits)
             {
                 acum1 += t.hp * t.pontos;
             }
-            return -acum1;
+            return -999999;
         }
+
+        return 12345;
     }
 }
