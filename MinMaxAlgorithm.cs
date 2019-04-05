@@ -50,6 +50,12 @@ public class MinMaxAlgorithm : MoveMaker
         for (int i = 0; i < available_states.Count; i++)
         {
             this.MaxPlayer.ExpandedNodes = 0;
+            if (isFinal(available_states[i]))
+            {
+                if( utilityfunc.evaluate(available_states[i]) > 0){
+                    return available_states[i];
+                }
+            }  
             poi = SMin(new State(available_states[i]), alfa, beta);
             Debug.Log("Valor de poi: "+ poi);
             if (aux < poi)
@@ -57,8 +63,6 @@ public class MinMaxAlgorithm : MoveMaker
                 aux1 = available_states[i];
                 aux = poi;
             }
-            
-
         }
         return aux1;
     }
@@ -112,7 +116,6 @@ public class MinMaxAlgorithm : MoveMaker
             best = Math.Min(best, SMax(new State(available_states[i]), alfa, beta));
             if (best <= alfa)
             {
-                alpa1 += 1;
                 return best;
             }
             beta = Math.Min(beta, best);
