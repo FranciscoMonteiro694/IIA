@@ -1,17 +1,18 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DeepCopyExtensions;
 
-public class MinMaxAlgorithm: MoveMaker
+public class MinMaxAlgorithm : MoveMaker
 {
     public EvaluationFunction evaluator;
-    private UtilityFunction utilityfunc; 
+    private UtilityFunction utilityfunc;
     public int depth = 0;
+    public int alpa1 = 0, alpa11 = 0;
     private PlayerController MaxPlayer;
     private PlayerController MinPlayer;
-    
+
     public MinMaxAlgorithm(PlayerController MaxPlayer, EvaluationFunction eval, UtilityFunction utilf, PlayerController MinPlayer)
     {
         this.MaxPlayer = MaxPlayer;
@@ -23,77 +24,102 @@ public class MinMaxAlgorithm: MoveMaker
     public override State MakeMove()
     {
         // The move is decided by the selected state
-        return GenerateNewState(); 
+        return GenerateNewState();
     }
 
     private State GenerateNewState()
     {
+        float alfa = -9999999, beta = +9999999;
         // Creates initial state
+        alpa1 = 0;
         State newState = new State(this.MaxPlayer, this.MinPlayer);
         // Call the MinMax implementation
-        State bestMove = MinMax(newState); //Aqui comeca a chamar como se fosse o Max
+        State bestMove = MinMax(newState, alfa, beta); //Aqui comeca a chamar como se fosse o Max
         // returning the actual state. You should modify this
         return bestMove;
     }
 
-    public State MinMax(State currentState) //1 se Max e 2 se Min
+    public State MinMax(State currentState, float alfa, float beta) //1 se Max e 2 se Min
     {
+
         this.MaxPlayer.ExpandedNodes = 0;
+        State aux1 = null;
         float aux = -999999;
-        State aux1=null;
-        List<State> available_states = GeneratePossibleStates(new State(currentState));
+        float poi = 0;
+        List<State> available_states = GeneratePossibleStates(currentState);
         for (int i = 0; i < available_states.Count; i++)
         {
-            if (aux < SMin(available_states[i]))
+            this.MaxPlayer.ExpandedNodes = 0;
+            if (isFinal(available_states[i]))
             {
-                aux1=available_states[i];
+                if (utilityfunc.evaluate(available_states[i]) > 0)
+                {
+                    return available_states[i];
+                }
             }
-        }
-        if (aux1 == null)
-        {
-            Debug.Log("Vou me foder!");
+            poi = SMin(new State(available_states[i]), alfa, beta);
+            if (aux < poi)
+            {
+                aux1 = available_states[i];
+                aux = poi;
+            }
         }
         return aux1;
     }
 
-    public float SMax(State state)
+    public float SMax(State state, float alfa, float beta)
     {
-        if (isFinal(state))
+
+        if (isFinal(new State(state)))
         {
-            return utilityfunc.evaluate(state);
+            return utilityfunc.evaluate(new State(state));
         }
-        if (this.MaxPlayer.ExpandedNodes >= 1000)
+        if (this.MaxPlayer.ExpandedNodes >= this.MaxPlayer.MaximumNodesToExpand)
         {
-            return evaluator.evaluate(state);
+            return evaluator.evaluate(new State(state));
         }
+
         List<State> available_states = new List<State>();
-        available_states = GeneratePossibleStates(new State(state)); //gera todas as possibilidades na prespetiva do adversario (daí o new) ns se ta bem
+        available_states = GeneratePossibleStates(state);
         int i;
-        float best = SMin(available_states[0]);
-        for (i = 1; i < available_states.Count; i++)
+        float best = -999999;
+        for (i = 0; i < available_states.Count; i++)
         {
-            best = Math.Max(best, SMin(available_states[i]));
+            best = Math.Max(best, SMin(new State(available_states[i]), alfa, beta));
+            if (best >= beta)
+            {
+                return best;
+            }
+            alfa = Math.Max(alfa, best);
+
         }
         return best;
     }
 
-    public float SMin(State state)
+    public float SMin(State state, float alfa, float beta)
     {
-        if (isFinal(state))
+
+        if (isFinal(new State(state)))
         {
-            return utilityfunc.evaluate(state);
+            return utilityfunc.evaluate(new State(state));
         }
-        if (this.MaxPlayer.ExpandedNodes >= 1000)
+        if (this.MaxPlayer.ExpandedNodes >= this.MaxPlayer.MaximumNodesToExpand)
         {
-            return evaluator.evaluate(state);
+            return evaluator.evaluate(new State(state));
         }
+
         List<State> available_states = new List<State>();
-        available_states = GeneratePossibleStates(new State(state));
+        available_states = GeneratePossibleStates(state);
         int i;
-        float best = SMax(available_states[0]);
-        for (i = 1; i < available_states.Count; i++)
+        float best = +999999;
+        for (i = 0; i < available_states.Count; i++)
         {
-            best = Math.Max(best, SMax(available_states[i]));
+            best = Math.Min(best, SMax(new State(available_states[i]), alfa, beta));
+            if (best <= alfa)
+            {
+                return best;
+            }
+            beta = Math.Min(beta, best);
         }
         return best;
     }
@@ -106,17 +132,13 @@ public class MinMaxAlgorithm: MoveMaker
         else { return false; }
     }
 
-    public float alphaBeta(State state)
-    {
-
-    }
 
 
     private List<State> GeneratePossibleStates(State state)
     {
         List<State> states = new List<State>();
         //Generate the possible states available to expand
-        foreach(Unit currentUnit in state.PlayersUnits)
+        foreach (Unit currentUnit in state.PlayersUnits)
         {
             // Movement States
             List<Tile> neighbours = currentUnit.GetFreeNeighbours(state);
@@ -145,7 +167,7 @@ public class MinMaxAlgorithm: MoveMaker
         return states;
     }
 
-    private State MoveUnit(State state,  Tile destination)
+    private State MoveUnit(State state, Tile destination)
     {
         Unit currentUnit = state.unitToPermormAction;
         //First: Update Board
