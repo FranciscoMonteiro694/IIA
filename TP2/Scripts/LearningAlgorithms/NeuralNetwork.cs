@@ -30,6 +30,7 @@ public class NeuralNetwork {
 		//{3,5,2} -> 3 inputs, 1 hidden with 5 neurons, 2 outputs
 		this.parameters = parameters;
 		initializeVariables ();
+
 	}
 
 	public NeuralNetwork(int [] parameters, int random) {

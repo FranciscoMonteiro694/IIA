@@ -201,13 +201,13 @@ public class EvolvingCarControl : MonoBehaviour {
 		if (!simulating) {
 			Debug.Log (metaengine.overallBest.ToString ());
 			Debug.Log ("best fitness !" + metaengine.overallBest.Fitness);
-			SimulationInfo info = createSimulation (0, new Rect (0.0f, 0.0f, 1f, 1f), 0);
+
+            SimulationInfo info = createSimulation (0, new Rect (0.0f, 0.0f, 1f, 1f), 0);
 			info.playerc.neuralController = metaengine.overallBest.getIndividualController ();
 			info.playerc.running = true;
 			bestSimulation = info.sim;
 			simulating = true;
-
-		} else if (simulating) {
+        } else if (simulating) {
 			if (!bestSimulation.GetComponentInChildren<NeuralController> ().running && bestSimulation.GetComponentInChildren<NeuralController> ().gameOver) {
 				simulating = false;
 				Destroy (bestSimulation);

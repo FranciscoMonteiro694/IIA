@@ -85,7 +85,7 @@ public class NeuralController : MonoBehaviour
 			SensorHandling ();
 			// move the car
 			float[] result = this.neuralController.process (sensorsInput);
-			float h = result [0];
+			float h = result [0];//Erro aqui
 			float v = result [1];
         
             m_Car.Move (h, v, v, 0);
@@ -190,21 +190,103 @@ public class NeuralController : MonoBehaviour
 
     }
 
-    // Original está em baixo
-	//public float GetScore() {
- //       Debug.Log("Estou na função de fitness");
- //       // Fitness function. The code to attribute fitness to individuals should be written here.  
- //       float fitness = 10 / distancefromBallToMyGoal - (distancefromBallToAdversaryGoal + distanceToBall);
- //       return fitness;
-	//}
-
 
     public float GetScore()
     {
-        // Fitness function. The code to attribute fitness to individuals should be written here.  
-        float fitness = driveTime * distanceTravelled;
-        return fitness;
+        int difGolos;
+        float fitness;
+        difGolos =  GoalsOnAdversaryGoal -  GoalsOnMyGoal;
+        //Debug.Log("Valor do distance travelled" + distanceTravelled);
+
+        //Diferença de golos
+        // se estiver empatado
+        if (difGolos == 0)
+        {
+            fitness = 1 / distancefromBallToAdversaryGoal;
+            fitness = (float)Math.Pow(fitness,3);
+            return fitness;
+        }
+        else
+        {
+            fitness = difGolos*2;
+            fitness = (float)Math.Pow(fitness, 3)*driveTime;
+            return fitness;
+        }
+
+
     }
+
+    // Em último caso vai esta
+    //public float GetScore()
+    //{
+    //    int difGolos;
+    //    float fitness;
+    //    difGolos = GoalsOnAdversaryGoal - GoalsOnMyGoal;
+    //    //Debug.Log("Valor do current distance" + currentDistance);
+    //    //Debug.Log("Valor do distance travelled" + distanceTravelled);
+
+    //    //Diferença de golos
+    //    // Se for menor que 0
+    //    if (difGolos < 0)
+    //    {
+    //        // Vamos dar um valor de aptidão baixo para este elemento
+    //        fitness = difGolos;
+
+    //    }
+    //    else
+    //    {
+    //        // Caso de empate
+    //        if (difGolos == 0)
+    //        {
+    //            fitness = 10;
+    //        }
+    //        // Caso esteja com vantagem
+    //        fitness = difGolos * 100 * Math.Abs(avgSpeed);
+
+    //    }
+    //    return fitness;
+    //}
+    // Estávamos a usar este
+    //public float GetScore()
+    //{
+    //    int fatorGolo = 10;
+    //    float fitness;
+    //    fitness =  GoalsOnAdversaryGoal -  GoalsOnMyGoal;
+    //    if (fitness < 0)
+    //    {
+    //        return (float)Math.Pow(fitness, 2);
+    //    }
+
+    //    return fitness*fatorGolo*(1/(distanceToBall/10000)) * (1 / (distanceTravelled / 10000));
+    //}
+
+
+
+
+
+    //Original está em baixo
+    //public float GetScore() {
+    //       Debug.Log("Estou na função de fitness");
+    //       Debug.Log("Distancia até à baliza adversária"+distancefromBallToAdversaryGoal);
+    //       Debug.Log("Distancia até à bola" + distanceToBall);
+    //       // Fitness function. The code to attribute fitness to individuals should be written here.  
+    //       float fitness = 10 / ((distanceToBall / 1000) + (distanceToAdversaryGoal + distancefromBallToAdversaryGoal));
+
+    //       if (hitTheBall>0)
+    //       {
+    //           fitness = fitness * 10;
+    //       }
+
+    //       return fitness;
+    //}
+
+
+    //public float GetScore()
+    //{
+    //    // Fitness function. The code to attribute fitness to individuals should be written here.  
+    //    float fitness = driveTime * distanceTravelled;
+    //    return fitness;
+    //}
 
 
 

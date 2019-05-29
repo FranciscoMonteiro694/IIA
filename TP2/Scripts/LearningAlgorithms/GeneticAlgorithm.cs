@@ -7,13 +7,13 @@ public class GeneticAlgorithm : MetaHeuristic {
 	public float crossoverProbability;
 	public int tournamentSize; // 
 	public bool elitist;//número de individuos que são preservados de uma geração para a outra
+    public int numeroValoresPreservados;
 
 
     // Função alterada, original em baixo
 	public override void InitPopulation() {
         population = new List<Individual>();
         Debug.Log("Estou a inicializar a população no Genetic");
-        Debug.Log("Tamanho do torneio" + tournamentSize);
         // jncor 
         while (population.Count < populationSize)
         {
@@ -21,12 +21,17 @@ public class GeneticAlgorithm : MetaHeuristic {
             new_ind.Initialize();
             population.Add(new_ind);
         }
+        Debug.Log("População inicializada");
+        Debug.Log("Valor"+numeroValoresPreservados);
 	}
     // Função alterada, original em baixo
     public override void Step()
     {
+
         // You should implement the code runs in each generation here
         // Nova população
+        int contador;
+        contador = 0;
         List<Individual> new_pop = new List<Individual>();
         updateReport();
         for (int i = 0; i < populationSize; i++)
@@ -39,6 +44,18 @@ public class GeneticAlgorithm : MetaHeuristic {
             new_pop.Add(x);
         }
 
+        if (elitist)
+        {
+            while (contador<numeroValoresPreservados)
+            {
+                new_pop[contador] = overallBest.Clone();
+                contador++;
+            }
+        }
+
+        population = new_pop;
+
+        generation++;
     }
 
     public Individual torneio()
@@ -53,6 +70,7 @@ public class GeneticAlgorithm : MetaHeuristic {
         while (contador < tournamentSize)
         {
             indice = (int)Random.Range(0, populationSize);
+            //Debug.Log("Indice do torneio"+indice);
             aux = population[indice].Clone();
             auxiliar.Add(aux);
             if (aux.Fitness > best)

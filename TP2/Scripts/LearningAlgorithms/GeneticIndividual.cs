@@ -25,6 +25,7 @@ public class GeneticIndividual : Individual {
         {
             if (Random.Range(0.0f, 1.0f) < probability)
             {
+                //Debug.Log("Vou dar crossover neste gene");
                 this.geno[i] = partner.geno[i];
             }
         }
@@ -37,6 +38,7 @@ public class GeneticIndividual : Individual {
         {
             if (Random.Range(0.0f, 1.0f) < probability)
             {
+                //Debug.Log("Vou mutar este gene");
                 genotype[i] = Random.Range(-1.0f, 1.0f);
             }
         }
